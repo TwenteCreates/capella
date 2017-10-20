@@ -51,15 +51,20 @@
 		<main id="content">
 			<section>
 				<h2 class="section-title">Friends</h2>
-				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
+				<!-- <div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'> -->
+				<div class="row">
 					<?php foreach ($friends as $friend) { ?>
-					<div class="carousel-cell">
+					<!-- <div class="carousel-cell">
 						<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
+						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+					</div> -->
+					<div class="col">
+						<img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
 						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
 					</div>
 					<?php } ?>
 				</div>
-				<div class="card text-white bg-dark friend-card">
+				<div class="card text-white bg-dark friend-card mt-3">
 					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i>Paula's Live Location</div>
 					<div class="card-body">
 						<div class="mb-3" style="height: 100px; background:#aaa"></div>
@@ -137,14 +142,14 @@
 								id: <?php echo $_GET["id"]; ?>
 							}, function(response) {
 								if (response == 1) {
-									window.navigator.vibrate(200, 200, 200, 200);
-									console.log("Alert");
+									window.navigator.vibrate(3000);
+									alert("Anand is looking for you!");
 								} else {
 									console.log("We're good to go");
 								}
 							})
 						});
-					}, 5000);
+					}, 10000);
 				}
 			});
 		</script>
