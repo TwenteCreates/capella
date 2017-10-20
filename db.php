@@ -971,13 +971,15 @@ function nice_number($n) {
 
 date_default_timezone_set("Asia/Kolkata");
 
-if ($_SERVER["SERVER_NAME"] == "localhost") {
-  DB::$user = "root"; // Don't worry, this isn't real
-  DB::$password = "root";
-} else {
-  DB::$user = "creatr";
-  DB::$password = "1Anand01*";
-}
+// if ($_SERVER["SERVER_NAME"] == "localhost") {
+//   DB::$user = "root"; // Don't worry, this isn't real
+//   DB::$password = "root";
+// } else {
+//   DB::$user = "creatr";
+//   DB::$password = "1Anand01*";
+// }
+DB::$user = "root"; // Don't worry, this isn't real
+DB::$password = "root";
 DB::$dbName = "creatr";
 
 $currentURL = explode("/", "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
