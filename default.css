@@ -88,3 +88,13 @@ img {
 .card-header {
 	background-color: rgba(0, 0, 0, 0.2);
 }
+
+.top-right-button {
+	position: absolute;
+	right: 6px;
+	border: none;
+	top: 6px;
+}
+.top-right-button i {
+	transform: scale(1.75);
+}

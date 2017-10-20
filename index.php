@@ -30,7 +30,7 @@
 			<link rel="stylesheet" href="default.css">
 		</noscript>
 
-		<title>Cappella</title>
+		<title>Capella</title>
 		<meta name="description" content="...">
 		<meta name="twitter:site" content="@AnandChowdhary">
 		<link rel="author" href="//plus.google.com/+AnandChowdhary">
@@ -45,7 +45,8 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
 		<header id="masthead">
-			<div class="title">Cappella</div>
+			<div class="title">Capella</div>
+			<button class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
@@ -79,11 +80,11 @@
 				<div class="row">
 					<div class="col pr-0">
 						<img alt="" src="./images/friends.png">
-						<div class="caption mt-2">Find Friends</div>
+						<div class="caption mt-2">People</div>
 					</div>
 					<div class="col">
 						<img alt="" src="./images/events.png">
-						<div class="caption mt-2">Find Events</div>
+						<div class="caption mt-2">Events</div>
 					</div>
 				</div>
 				<div class="row mt-2">
@@ -94,6 +95,15 @@
 					<div class="col">
 						<img alt="" src="./images/singalong.png">
 						<div class="caption mt-2">SingAlong&trade;</div>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col pr-0">
+						<img alt="" src="./images/search.png">
+						<div class="caption mt-2">Music</div>
+					</div>
+					<div class="col">
+						&nbsp;
 					</div>
 				</div>
 			</section>
