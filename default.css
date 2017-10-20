@@ -1,0 +1,69 @@
+body {
+	background: #171717;
+	color: rgba(255, 255, 255, 0.95);
+	padding: 65px 15px;
+}
+
+#masthead, #colophon {
+	background: #2a282b;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	position: fixed;
+	left: 0; right: 0;
+}
+
+.title {
+	font-weight: 500;
+	color: #fff;
+	font-size: 107.5%;
+}
+
+#masthead {
+	top: 0;
+}
+#colophon {
+	bottom: 0;
+}
+
+#colophon {
+	line-height: 1;
+}
+#colophon i {
+	font-size: 26px;
+	margin-top: 5px;
+}
+#colophon .label {
+	font-size: 70%;
+	margin-top: 2px;
+	color: rgba(255, 255, 255, 0.6);
+}
+#colophon .active, #colophon .active .label {
+	color: #f06292;
+}
+
+section {
+	margin-bottom: 20px;
+}
+
+.section-title {
+	font-size: 90%;
+	color: rgba(255, 255, 255, 0.8);
+	margin: 0 0 15px 0;
+	padding: 0;
+	text-transform: uppercase;
+}
+
+.flickity-prev-next-button,
+.flickity-page-dots {
+	display: none;
+}
+
+.carousel-cell {
+	width: 100px;
+	margin-right: 15px;
+}
+
+img {
+	max-width: 100%;
+}
