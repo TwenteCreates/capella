@@ -55,7 +55,7 @@
 						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
 					</div> -->
 					<div class="col-4 mb-4">
-						<img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
+						<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>"><img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle"></a>
 						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
 					</div>
 					<?php } } ?>
@@ -88,7 +88,32 @@
 					</a>
 				</div>
 			</div>
-		</footer>
+			</footer>
+			
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" hidden>
+			Launch demo modal
+		</button>
+
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content bg-dark">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel"><i class="ion ion-md-alert mr-2"></i><span class="lookingName"></span> is searching for you</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p><?php echo DB::queryFirstRow("SELECT name FROM users WHERE id=%s", $me)["name"]; ?>, your friend <span class="lookingName"></span> is looking for you. If you're lost, you can click on "Navigate" and we'll take you to <span class="lookingName"></span>.</p>
+						<img alt="" class="lookingImg">
+					</div>
+					<div class="modal-footer">
+						<a href="tel:+31644691056" class="btn btn-secondary mr-2" data-dismiss="modal"><i class="ion ion-ios-call mr-2"></i>Call</a>
+						<a href="#" target="_blank" class="btn lookingMap btn-danger"><i class="ion ion-md-map mr-2"></i>Navigate</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
@@ -97,25 +122,41 @@
 		<script>
 			$(function() {
 				if (navigator.geolocation) {
-					setInterval(function() {
+					function doFunction() {
 						navigator.geolocation.getCurrentPosition(function(position) {
 							var $cords = JSON.stringify([position.coords.latitude, position.coords.longitude]);
-							// console.log($cords);
 							$.post("savelocation.php", {
 								cords: $cords,
 								id: <?php echo $_GET["id"]; ?>
 							}, function(response) {
-								if (response == 1) {
+								response = JSON.parse(response);
+								if (response.isSomeoneLookingForMe == 1) {
+									console.log(response);
+									$('[data-target="#exampleModal"]').click();
+									$(".lookingName").text(response.who_is_looking_name);
+									$(".lookingImg").attr("src", "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=" + JSON.parse(response.location)[0] + "," + JSON.parse(response.location)[1] + "&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU");
+									$(".lookingMap").attr("href", "http://maps.google.com/maps?f=d&daddr=" + (JSON.parse(response.location)[0]).toFixed(9) + "," + (JSON.parse(response.location)[1]).toFixed(9));
 									window.navigator.vibrate(3000);
-									alert("Anand is looking for you!");
 								} else {
 									console.log("We're good to go");
 								}
 							})
 						});
+					}
+					doFunction();
+					setInterval(function() {
+						doFunction();
 					}, 10000);
 				}
 			});
+			function pingUser(user) {
+				$("#pingText").text("Pinging...");
+				$("#pingText").css("opacity", 0.5);
+				$.get("pingme.php?id=<?php echo $_GET["id"]; ?>&user=<?php echo $_GET["user"]; ?>", function() {
+					$("#pingText").text("Ping");
+					$("#pingText").css("opacity", 1);
+				});
+			}
 		</script>
 
 	</body>

@@ -1,14 +1,12 @@
 <?php
 	include "db.php";
 	session_start();
-	$genres = ["Jazz", "Folk", "Blues", "Rock", "Hip hop", "Pop", "Reggae", "Country", "Classical period", "Punk rock", "Rhythm and blues", "Singing", "Popular", "Rapping", "Alternative rock", "Classical", "Electronic dance", "Opera", "Techno", "Soul", "Funk", "House", "Instrumental", "Disco", "Art", "Trance", "Independent", "Heavy metal", "Gospel", "Breakbeat", "Electro", "Jazz fusion", "Dubstep", "Acoustic", "Ambient", "Orchestra", "Drum and bass", "Grunge", "Soundtrack", "Chant", "Ska", "Dance", "Dub", "Psychedelic", "Hardstyle", "Dancehall", "World", "EDM", "Bluegrass", "Downtempo"];
-	$randMe = $genres[array_rand($genres, 1)];
-	$a = json_decode(file_get_contents("https://itunes.apple.com/search?term=" . $randMe . "&limit=20&media=music"));
-	$song = $a->results[array_rand($a->results, 1)];
-	if (!$song) {
-		header("Refresh: 0");
-	}
+	$friends = DB::query("SELECT * FROM friends WHERE friend1=%s OR friend2=%s", $_GET["id"]);
 	$me = $_GET["id"];
+	if (!$me) {
+		header("Location: ?id=1");
+	}
+	$user = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $_GET["user"]);
 ?>
 <!doctype html>
 <html lang="en">
@@ -26,7 +24,6 @@
 		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
 		<meta name="theme-color" content="#292929">		
 
-		<link rel="stylesheet" href="https://unpkg.com/flickity@2.0.10/dist/flickity.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://anandchowdhary.github.io/ionicons-3-cdn/icons.css" integrity="sha384-+iqgM+tGle5wS+uPwXzIjZS5v6VkqCUV7YQ/e/clzRHAxYbzpUJ+nldylmtBWCP0" crossorigin="anonymous">
 		<link rel="stylesheet" href="default.css">
@@ -46,76 +43,50 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
 		<header id="masthead">
-			<div class="title">Taste</div>
+			<div class="title">Capella</div>
 			<button class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
 			<section>
-				<div class="card text-white bg-dark">
-					<div class="card-header"><i class="ion ion-ios-musical-note mr-2"></i><?php echo $song->trackName; ?></div>
+				<div class="card text-white bg-dark friend-card mb-4">
+					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i><?php echo $user["name"]; ?>'s Live Location</div>
 					<div class="card-body">
-						<audio class="mb-3" src="<?php echo $song->previewUrl; ?>" controls></audio>
-						<div class="row text-center like-unlike">
-							<a href="savetaste.php?id=<?php echo $me; ?>&genre=<?php echo urlencode($song->primaryGenreName); ?>&artist=<?php echo urlencode($song->artistName); ?>&action=dislike" class="col">
-								<i class="ion ion-ios-thumbs-down"></i>
-								<div>Dislike</div>
-							</a>
-							<a href="savetaste.php?id=<?php echo $me; ?>&genre=<?php echo urlencode($song->primaryGenreName); ?>&artist=<?php echo urlencode($song->artistName); ?>&action=like" class="col">
-								<i class="ion ion-ios-thumbs-up"></i>
-								<div>Like</div>
-							</a>
-						</div>
+						<img class="mb-3" alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=52.4014634,4.8932525&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
+						<button class="btn btn-primary mr-1" onclick="pingUser('<?php echo $user["id"]; ?>')"><i class="ion ion-ios-notifications mr-2"></i><span id="pingText">Ping</span></button>
+						<button class="btn btn-secondary mr-1"><i class="ion ion-ios-call mr-2"></i>Call</button>
+						<button class="btn btn-secondary"><i class="ion ion-md-volume-up mr-2"></i>Ring</button>
+						<p class="text-muted small mt-3 mb-0">By pinging <?php echo $user["name"]; ?>, you'll vibrate her phone and share your location with her.</p>
 					</div>
 				</div>
-				<div class="card text-white bg-dark mt-3">
-					<div class="card-header"><i class="ion ion-ios-information-circle mr-2"></i>Details</div>
-					<div class="card-body">
-						<div class="row song-info">
-							<div class="col-4 pr-0">
-								<img alt="" src="<?php echo $song->artworkUrl100; ?>">
-							</div>
-							<div class="col">
-								<div><strong><?php echo $song->trackName; ?></strong></div>
-								<div><?php echo $song->artistName; ?></div>
-								<div class="text-muted"><?php echo $song->primaryGenreName; ?></div>
-							</div>
-						</div>
-						<div class="row mt-3">
-							<div class="col">
-								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Aitunes.apple.com" target="_blank">
-									<img alt="" src="https://tse2.mm.bing.net/th?q=Apple+music+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
-								</a>
-							</div>
-							<div class="col">
-								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Ayoutube.com" target="_blank">
-									<img alt="" src="https://tse2.mm.bing.net/th?q=YouTube+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
-								</a>
-							</div>
-							<div class="col">
-								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Asoundcloud.com" target="_blank">
-									<img alt="" src="https://tse2.mm.bing.net/th?q=Soundcloud+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
-								</a>
-							</div>
-							<div class="col">
-								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Aplay.google.com" target="_blank">
-									<img alt="" src="https://tse2.mm.bing.net/th?q=Google+Play+Music+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
-								</a>
-							</div>
-							<div class="col">
-								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Aopen.spotify.com" target="_blank">
-									<img alt="" src="https://tse2.mm.bing.net/th?q=Spotify+new+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
-								</a>
-							</div>
-						</div>
+				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
+				<!-- <div class="row"> -->
+					<?php foreach ($friends as $friend1) {
+						$m1 = "friend1";
+						if ($friend1["friend1"] == $me) { $m1 = "friend2"; }
+						$friend = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $friend1[$m1]); ?>
+					<div class="carousel-cell">
+						<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>" class="<?php if ($_GET["user"] == $friend["id"]) { echo "currentprofile"; } ?>">
+							<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
+						</a>
+						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
 					</div>
+					<!-- <div class="col">
+						<img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
+						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+					</div> -->
+					<?php } ?>
 				</div>
-				<div class="card text-white bg-dark mt-3">
-					<div class="card-header"><i class="ion ion-ios-list mr-2"></i>Lyrics</div>
+				<!-- <div class="card text-white bg-dark friend-card mt-3">
+					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i>Paula's Live Location</div>
 					<div class="card-body">
-						<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+lyrics" target="_blank" class="btn btn-secondary btn-block">Open Song Lyrics</a>
+						<img class="mb-3" alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=52.4014634,4.8932525&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
+						<button class="btn btn-primary mr-1"><i class="ion ion-ios-notifications mr-2"></i>Ping</button>
+						<button class="btn btn-secondary mr-1"><i class="ion ion-ios-call mr-2"></i>Call</button>
+						<button class="btn btn-secondary"><i class="ion ion-md-volume-up mr-2"></i>Ring</button>
+						<p class="text-muted small mt-3 mb-0">By pinging Paula, you'll vibrate her phone and share your location with her.</p>
 					</div>
-				</div>
+				</div> -->
 			</section>
 		</main>
 
@@ -126,7 +97,7 @@
 						<i class="ion ion-ios-home"></i>
 						<div class="label">Home</div>
 					</a>
-					<a href="./taste.php?id=<?php echo $_GET["id"]; ?>" class="col active">
+					<a href="./taste.php?id=<?php echo $_GET["id"]; ?>" class="col">
 						<i class="ion ion-ios-musical-notes"></i>
 						<div class="label">Taste</div>
 					</a>
@@ -134,7 +105,7 @@
 						<i class="ion ion-ios-search"></i>
 						<div class="label">Search</div>
 					</a>
-					<a href="./people.php?id=<?php echo $_GET["id"]; ?>" class="col">
+					<a href="./people.php?id=<?php echo $_GET["id"]; ?>" class="col active">
 						<i class="ion ion-ios-people"></i>
 						<div class="label">People</div>
 					</a>
