@@ -27,7 +27,6 @@
 			"who_is_looking" => null,
 			"who_is_looking_name" => null,
 			"need_help" => null,
-			"location" => null,
 		], "id=%s", $_POST["id"]);
 	}
 ?>

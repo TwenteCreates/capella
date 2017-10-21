@@ -57,14 +57,14 @@
 						</div>
 						<p id="ajdfds">Calculating...</p>
 						<img class="mb-3" alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=<?php echo json_decode($user["location"])[0] . ",+" . json_decode($user["location"])[1]; ?>&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
-						<button class="btn btn-primary mr-1" onclick="pingUser('<?php echo $user["id"]; ?>')"><i class="ion ion-ios-notifications mr-2"></i><span id="pingText">Ping</span></button>
+						<button class="btn btn-primary mr-1" onclick="pingUser('<?php echo $user["id"]; ?>', null)"><i class="ion ion-ios-notifications mr-2"></i><span id="pingText">Ping</span></button>
 						<a href="tel:+31644691056" class="btn btn-secondary mr-1"><i class="ion ion-ios-call mr-2"></i>Call</a>
 						<button class="btn btn-secondary"><i class="ion ion-md-volume-up mr-2"></i>Ring</button>
 						<p class="text-muted small mt-3 mb-0">By pinging <?php echo $user["name"]; ?>, you'll vibrate her phone and share your location with her.</p>
 					</div>
 				</div>
 				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
-					<?php var_dump($friends); foreach ($friends as $friend1) {
+					<?php foreach ($friends as $friend1) {
 						$m1 = "friend1";
 						if ($friend1["friend1"] == $me) { $m1 = "friend2"; }
 						$friend = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $friend1[$m1]); ?>
@@ -155,7 +155,7 @@
 				<div class="modal-body">
 					<p>Do you need immediate assistance? Select one of the options below:</p>
 					<button class="btn btn-block btn-lg btn-secondary mr-2" data-dismiss="modal" onclick="<?php foreach ($friends as $friend) { if ($friend["id"] != $_GET["id"]) { echo "pingUser('" . $friend["id"] . "', 'emergency');"; } } ?>"><i class="ion ion-md-map mr-2"></i>Share Location with Friends</button>
-					<a href="#" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
+					<a href="tel:112" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
 				</div>
 			</div>
 		</div>
@@ -207,7 +207,17 @@
 					var b = <?php echo json_decode($user["location"])[1]; ?> - position.coords.longitude;
 					var c = Math.sqrt(a*a + b*b);
 					$("#ajdfds").html("Move in this direction for " + parseInt(c*69.172*1.60934*1000) + " meters");
-					$(".arrow-span").css("transform", "rotate(" + parseInt(angleDeg) + "deg)");
+					var prevalpha = 0; var x = 0;
+					window.addEventListener("deviceorientation", function(event) {
+						var alpha = event.alpha;
+						if (x == 0) {
+							prevalpha = alpha;
+							x = 1;
+						} else {
+							alpha -= prevalpha;
+						}
+						$(".arrow-span").css("transform", "rotate(" + parseInt(angleDeg + alpha) + "deg)");
+					}, true);
 					$(".arrow-span").css("display", "inline-block");
 				});
 				function doFunction() {
@@ -225,7 +235,7 @@
 								$(".lookingImg").attr("src", "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=" + JSON.parse(response.location)[0] + "," + JSON.parse(response.location)[1] + "&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU");
 								$(".lookingMap").attr("href", "http://maps.google.com/maps?f=d&daddr=" + (JSON.parse(response.location)[0]).toFixed(9) + "," + (JSON.parse(response.location)[1]).toFixed(9));
 								window.navigator.vibrate(3000);
-								if (response.need_help == 1) {
+								if (response.need_help != null) {
 									console.log("HELP MESSAGE");
 									$(".lookingName").eq(1).parent().html('Your friend, ' + response.who_is_looking_name + ' needs your immediate assistance. Reach his location ASAP or contact him immediately.');
 									$(".lookingName").first().parent().html('<i class="ion ion-md-alert mr-2"></i>' + response.who_is_looking_name + ' is in an emergency!');
@@ -243,9 +253,10 @@
 			}
 		});
 		function pingUser(user, type) {
-			if (!type) { type = null }
+			console.log(type);
 			$("#pingText").text("Pinging...");
 			$("#pingText").css("opacity", 0.5);
+			console.log("pingme.php?id=<?php echo $_GET["id"]; ?>&user=" + user + "&type=" + type);
 			$.get("pingme.php?id=<?php echo $_GET["id"]; ?>&user=" + user + "&type=" + type, function() {
 				$("#pingText").text("Ping");
 				$("#pingText").css("opacity", 1);

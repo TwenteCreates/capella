@@ -2,7 +2,7 @@
 	include "db.php";
 	session_start();
 	$me = $_GET["id"];
-	$a = json_decode(file_get_contents("https://graph.facebook.com/v2.10/amsterdamdanceevent/events?access_token=EAACEdEose0cBANWmL60cmwOtIgHGWKodo0vqNpYA4oz88N4T4imwyfUbaZCysnnnH298Bqan8IJZAm1A9yGpN67znxBflDLNTCKfDp9doqGr5agQXhnpgx6uFosYEamr5KZBgC5hnyZAxHZAY5UTGqZCV228w1nyipvNc2N0ZCrsjIQxGEVtZAdlsZA6k40JpOdwZD"))->data;
+	$a = json_decode(file_get_contents("https://graph.facebook.com/v2.10/amsterdamdanceevent/events?access_token=EAACEdEose0cBAGJh8UY55SEfYMzIXQoFvf0IKfCGBhWkQz2pPtmfes7RiJzxTTJWh6u1zpmYAbUvndARtef8qoApTNtWzTZCpVZAIlTIrOZB27J3xhZCc5KZBQl2OsS4KQiu5W1DZCo7vO8zoGkamL5omK9ChS4GQqLS88JIqjC9z6rkKXZAyC8W1LQ7FGAtaQZD"))->data;
 ?>
 <!doctype html>
 <html lang="en">
@@ -113,7 +113,7 @@
 			<div class="modal-body">
 				<p>Do you need immediate assistance? Select one of the options below:</p>
 				<button class="btn btn-block btn-lg btn-secondary mr-2" data-dismiss="modal" onclick="<?php foreach ($friends as $friend) { if ($friend["id"] != $_GET["id"]) { echo "pingUser('" . $friend["id"] . "', 'emergency');"; } } ?>"><i class="ion ion-md-map mr-2"></i>Share Location with Friends</button>
-				<a href="#" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
+				<a href="tel:112" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
 			</div>
 		</div>
 	</div>
@@ -166,7 +166,7 @@
 							$(".lookingImg").attr("src", "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=" + JSON.parse(response.location)[0] + "," + JSON.parse(response.location)[1] + "&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU");
 							$(".lookingMap").attr("href", "http://maps.google.com/maps?f=d&daddr=" + (JSON.parse(response.location)[0]).toFixed(9) + "," + (JSON.parse(response.location)[1]).toFixed(9));
 							window.navigator.vibrate(3000);
-							if (response.need_help == 1) {
+							if (response.need_help != null) {
 								console.log("HELP MESSAGE");
 								$(".lookingName").eq(1).parent().html('Your friend, ' + response.who_is_looking_name + ' needs your immediate assistance. Reach his location ASAP or contact him immediately.');
 								$(".lookingName").first().parent().html('<i class="ion ion-md-alert mr-2"></i>' + response.who_is_looking_name + ' is in an emergency!');

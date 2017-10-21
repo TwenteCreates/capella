@@ -3,6 +3,20 @@
 	session_start();
 	$friends = DB::query("SELECT * FROM users WHERE id != %s", $_GET["id"]);
 	$me = $_GET["id"];
+	$f = [];
+	$myLikes = DB::query("SELECT DISTINCT genre FROM likes WHERE who_likes=%s", $_GET["id"]);
+	foreach ($myLikes as $elt) {
+		array_push($f, $elt["genre"]);
+	}
+	$myLikes = DB::query("SELECT DISTINCT artist FROM likes WHERE who_likes=%s", $_GET["id"]);
+	foreach ($myLikes as $elt) {
+		array_push($f, $elt["artist"]);
+	}
+	$g = DB::query("SELECT DISTINCT who_likes FROM likes WHERE (genre IN %ls OR artist IN %ls) AND who_likes != %s", $f, $f, $_GET["id"]);
+	$k = [];
+	foreach ($g as $h) {
+		array_push($k, DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $h["who_likes"]));
+	}
 ?>
 <!doctype html>
 <html lang="en">
@@ -49,7 +63,7 @@
 				<p class="mb-4">Discover new people with matching music tastes as you.</p>
 				<!-- <div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'> -->
 				<div class="row">
-					<?php foreach ($friends as $friend) { if (!DB::queryFirstRow("SELECT * FROM friends WHERE friend1=%s AND friend2=%s OR friend1=%s AND friend2=%s", $_GET["id"], $friend["id"], $friend["id"], $_GET["id"])) { ?>
+					<?php foreach ($k as $friend) { if (!DB::queryFirstRow("SELECT * FROM friends WHERE friend1=%s AND friend2=%s OR friend1=%s AND friend2=%s", $_GET["id"], $friend["id"], $friend["id"], $_GET["id"])) { ?>
 					<!-- <div class="carousel-cell">
 						<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
 						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
@@ -108,7 +122,7 @@
 			<div class="modal-body">
 				<p>Do you need immediate assistance? Select one of the options below:</p>
 				<button class="btn btn-block btn-lg btn-secondary mr-2" data-dismiss="modal" onclick="<?php foreach ($friends as $friend) { if ($friend["id"] != $_GET["id"]) { echo "pingUser('" . $friend["id"] . "', 'emergency');"; } } ?>"><i class="ion ion-md-map mr-2"></i>Share Location with Friends</button>
-				<a href="#" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
+				<a href="tel:112" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
 			</div>
 		</div>
 	</div>
@@ -161,7 +175,7 @@
 							$(".lookingImg").attr("src", "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=" + JSON.parse(response.location)[0] + "," + JSON.parse(response.location)[1] + "&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU");
 							$(".lookingMap").attr("href", "http://maps.google.com/maps?f=d&daddr=" + (JSON.parse(response.location)[0]).toFixed(9) + "," + (JSON.parse(response.location)[1]).toFixed(9));
 							window.navigator.vibrate(3000);
-							if (response.need_help == 1) {
+							if (response.need_help != null) {
 								console.log("HELP MESSAGE");
 								$(".lookingName").eq(1).parent().html('Your friend, ' + response.who_is_looking_name + ' needs your immediate assistance. Reach his location ASAP or contact him immediately.');
 								$(".lookingName").first().parent().html('<i class="ion ion-md-alert mr-2"></i>' + response.who_is_looking_name + ' is in an emergency!');
