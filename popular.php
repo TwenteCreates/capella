@@ -1,8 +1,11 @@
 <?php
 	include "db.php";
 	session_start();
-	$friends = DB::query("SELECT * FROM users WHERE id != %s", $_GET["id"]);
+	$friends = DB::query("SELECT * FROM friends WHERE friend1=%s OR friend2=%s", $_GET["id"]);
 	$me = $_GET["id"];
+	if (!$me) {
+		header("Location: ?id=1");
+	}
 ?>
 <!doctype html>
 <html lang="en">
@@ -20,7 +23,6 @@
 		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
 		<meta name="theme-color" content="#292929">		
 
-		<link rel="stylesheet" href="https://unpkg.com/flickity@2.0.10/dist/flickity.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://anandchowdhary.github.io/ionicons-3-cdn/icons.css" integrity="sha384-+iqgM+tGle5wS+uPwXzIjZS5v6VkqCUV7YQ/e/clzRHAxYbzpUJ+nldylmtBWCP0" crossorigin="anonymous">
 		<link rel="stylesheet" href="default.css">
@@ -40,25 +42,23 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
 		<header id="masthead">
-			<div class="title">People</div>
+			<div class="title">Popular Venues</div>
 			<button onclick='emergency();' class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
 			<section>
-				<p class="mb-4">Discover new people with matching music tastes as you.</p>
-				<!-- <div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'> -->
-				<div class="row">
-					<?php foreach ($friends as $friend) { if (!DB::queryFirstRow("SELECT * FROM friends WHERE friend1=%s AND friend2=%s OR friend1=%s AND friend2=%s", $_GET["id"], $friend["id"], $friend["id"], $_GET["id"])) { ?>
-					<!-- <div class="carousel-cell">
-						<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
-						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
-					</div> -->
-					<div class="col-4 mb-4">
-						<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>"><img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle"></a>
-						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+				<div class="card text-white bg-dark friend-card mb-4">
+					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i>Live Map</div>
+					<div class="card-body p-0">
+						<img alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x500&maptype=roadmap<?php
+							$us = DB::query("SELECT location FROM users");
+							foreach ($us as $users) {
+								$myL = json_decode($users["location"]);
+								echo "&markers=" . $myL[0] . ",+" . $myL[1];
+							}
+						?>&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
 					</div>
-					<?php } } ?>
 				</div>
 			</section>
 		</main>
@@ -78,7 +78,7 @@
 						<i class="ion ion-ios-search"></i>
 						<div class="label">Search</div>
 					</a>
-					<a href="./people.php?id=<?php echo $_GET["id"]; ?>" class="col active">
+					<a href="./people.php?id=<?php echo $_GET["id"]; ?>" class="col">
 						<i class="ion ion-ios-people"></i>
 						<div class="label">People</div>
 					</a>

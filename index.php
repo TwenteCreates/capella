@@ -43,7 +43,7 @@
 
 		<header id="masthead">
 			<div class="title">Capella</div>
-			<button class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
+			<button onclick='emergency();' class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
@@ -86,7 +86,7 @@
 				<h2 class="section-title">Discover</h2>
 				<div class="row">
 					<div class="col pr-0">
-						<img alt="" src="./images/friends.png">
+						<a href="people.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/friends.png"></a>
 						<div class="caption mt-2">People</div>
 					</div>
 					<div class="col">
@@ -99,7 +99,7 @@
 				<h2 class="section-title">Explore</h2>
 				<div class="row">
 					<div class="col pr-0">
-						<img alt="" src="./images/music.png">
+						<a href="taste.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/music.png"></a>
 						<div class="caption mt-2">Music Taste</div>
 					</div>
 					<div class="col">
@@ -109,7 +109,7 @@
 				</div>
 				<div class="row mt-2">
 					<div class="col pr-0">
-						<img alt="" src="./images/search.png">
+						<a href="search.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/search.png"></a>
 						<div class="caption mt-2">Music Finder</div>
 					</div>
 					<div class="col">
@@ -119,7 +119,7 @@
 				</div>
 				<div class="row mt-2">
 					<div class="col pr-0">
-						<img alt="" src="./images/map.png">
+						<a href="popular.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/map.png"></a>
 						<div class="caption mt-2">Popular Venues</div>
 					</div>
 					<div class="col">
@@ -155,6 +155,28 @@
 				</div>
 			</div>
 		</footer>
+
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" hidden>
+			Launch demo modal
+		</button>
+
+		<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content bg-dark">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel2"><i class="ion ion-md-alert mr-2"></i>Emergency</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Do you need immediate assistance? Select one of the options below:</p>
+						<button class="btn btn-block btn-lg btn-secondary mr-2" data-dismiss="modal" onclick="<?php foreach ($friends as $friend) { if ($friend["id"] != $_GET["id"]) { echo "pingUser('" . $friend["id"] . "', 'emergency');"; } } ?>"><i class="ion ion-md-map mr-2"></i>Share Location with Friends</button>
+						<a href="#" target="_blank" class="btn btn-block btn-lg lookingMap btn-danger"><i class="ion ion-ios-call mr-2"></i>Call Emergency Services</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" hidden>
 			Launch demo modal
@@ -203,6 +225,11 @@
 									$(".lookingImg").attr("src", "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=" + JSON.parse(response.location)[0] + "," + JSON.parse(response.location)[1] + "&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU");
 									$(".lookingMap").attr("href", "http://maps.google.com/maps?f=d&daddr=" + (JSON.parse(response.location)[0]).toFixed(9) + "," + (JSON.parse(response.location)[1]).toFixed(9));
 									window.navigator.vibrate(3000);
+									if (response.need_help == 1) {
+										console.log("HELP MESSAGE");
+										$(".lookingName").eq(1).parent().html('Your friend, ' + response.who_is_looking_name + ' needs your immediate assistance. Reach his location ASAP or contact him immediately.');
+										$(".lookingName").first().parent().html('<i class="ion ion-md-alert mr-2"></i>' + response.who_is_looking_name + ' is in an emergency!');
+									}
 								} else {
 									console.log("We're good to go");
 								}
@@ -215,14 +242,18 @@
 					}, 10000);
 				}
 			});
-			function pingUser(user) {
+			function pingUser(user, type) {
+				if (!type) { type = null }
 				$("#pingText").text("Pinging...");
 				$("#pingText").css("opacity", 0.5);
-				$.get("pingme.php?id=<?php echo $_GET["id"]; ?>&user=<?php echo $_GET["user"]; ?>", function() {
+				$.get("pingme.php?id=<?php echo $_GET["id"]; ?>&user=" + user + "&type=" + type, function() {
 					$("#pingText").text("Ping");
 					$("#pingText").css("opacity", 1);
 				});
 			}
+			function emergency() {
+			$('[data-target="#exampleModal2"]').click();
+		}
 		</script>
 
 	</body>

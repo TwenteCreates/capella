@@ -1,7 +1,10 @@
 <?php
 	include "db.php";
 	session_start();
-	$friends = DB::query("SELECT * FROM users WHERE id != %s", $_GET["id"]);
+	if (isset($_GET["q"])) {
+		$a = json_decode(file_get_contents("https://itunes.apple.com/search?term=" . urlencode($_GET["q"]) . "&limit=1&media=music"));
+		$song = $a->results[0];
+	}
 	$me = $_GET["id"];
 ?>
 <!doctype html>
@@ -40,27 +43,90 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
 		<header id="masthead">
-			<div class="title">People</div>
+			<div class="title">Search</div>
 			<button onclick='emergency();' class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
 			<section>
-				<p class="mb-4">Discover new people with matching music tastes as you.</p>
-				<!-- <div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'> -->
-				<div class="row">
-					<?php foreach ($friends as $friend) { if (!DB::queryFirstRow("SELECT * FROM friends WHERE friend1=%s AND friend2=%s OR friend1=%s AND friend2=%s", $_GET["id"], $friend["id"], $friend["id"], $_GET["id"])) { ?>
-					<!-- <div class="carousel-cell">
-						<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
-						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
-					</div> -->
-					<div class="col-4 mb-4">
-						<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>"><img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle"></a>
-						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+				<form method="get">
+					<div class="input-group">
+						<input type="hidden" name="id" value="<?php echo $_GET["value"]; ?>">
+						<input type="text" class="form-control" placeholder="Search for..." aria-label="Search for..." name="q" autofocus>
+						<span class="input-group-btn">
+							<button class="btn btn-danger" type="button">Search</button>
+						</span>
 					</div>
-					<?php } } ?>
+				</form>
+			</section>
+			<?php if (isset($_GET["q"])) { ?>
+			<section>
+				<div class="card text-white bg-dark">
+					<div class="card-header"><i class="ion ion-ios-musical-note mr-2"></i><?php echo $song->trackName; ?></div>
+					<div class="card-body">
+						<audio class="mb-3" src="<?php echo $song->previewUrl; ?>" controls></audio>
+						<div class="row text-center like-unlike">
+							<a href="savetaste.php?id=<?php echo $me; ?>&genre=<?php echo urlencode($song->primaryGenreName); ?>&artist=<?php echo urlencode($song->artistName); ?>&action=dislike" class="col">
+								<i class="ion ion-ios-thumbs-down"></i>
+								<div>Dislike</div>
+							</a>
+							<a href="savetaste.php?id=<?php echo $me; ?>&genre=<?php echo urlencode($song->primaryGenreName); ?>&artist=<?php echo urlencode($song->artistName); ?>&action=like" class="col">
+								<i class="ion ion-ios-thumbs-up"></i>
+								<div>Like</div>
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="card text-white bg-dark mt-3">
+					<div class="card-header"><i class="ion ion-ios-information-circle mr-2"></i>Details</div>
+					<div class="card-body">
+						<div class="row song-info">
+							<div class="col-4 pr-0">
+								<img alt="" src="<?php echo $song->artworkUrl100; ?>">
+							</div>
+							<div class="col">
+								<div><strong><?php echo $song->trackName; ?></strong></div>
+								<div><?php echo $song->artistName; ?></div>
+								<div class="text-muted"><?php echo $song->primaryGenreName; ?></div>
+							</div>
+						</div>
+						<div class="row mt-3">
+							<div class="col">
+								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Aitunes.apple.com" target="_blank">
+									<img alt="" src="https://tse2.mm.bing.net/th?q=Apple+music+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+								</a>
+							</div>
+							<div class="col">
+								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Ayoutube.com" target="_blank">
+									<img alt="" src="https://tse2.mm.bing.net/th?q=YouTube+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+								</a>
+							</div>
+							<div class="col">
+								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Asoundcloud.com" target="_blank">
+									<img alt="" src="https://tse2.mm.bing.net/th?q=Soundcloud+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+								</a>
+							</div>
+							<div class="col">
+								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Aplay.google.com" target="_blank">
+									<img alt="" src="https://tse2.mm.bing.net/th?q=Google+Play+Music+app+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+								</a>
+							</div>
+							<div class="col">
+								<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+site%3Aopen.spotify.com" target="_blank">
+									<img alt="" src="https://tse2.mm.bing.net/th?q=Spotify+new+icon&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card text-white bg-dark mt-3">
+					<div class="card-header"><i class="ion ion-ios-list mr-2"></i>Lyrics</div>
+					<div class="card-body">
+						<a href="https://duckduckgo.com/?q=!ducky+<?php echo urlencode($song->trackName . " " . $song->artistName); ?>+lyrics" target="_blank" class="btn btn-secondary btn-block">Open Song Lyrics</a>
+					</div>
 				</div>
 			</section>
+			<?php } ?>
 		</main>
 
 		<footer id="colophon">
@@ -74,11 +140,11 @@
 						<i class="ion ion-ios-musical-notes"></i>
 						<div class="label">Taste</div>
 					</a>
-					<a href="./search.php?id=<?php echo $_GET["id"]; ?>" class="col">
+					<a href="./search.php?id=<?php echo $_GET["id"]; ?>" class="col active">
 						<i class="ion ion-ios-search"></i>
 						<div class="label">Search</div>
 					</a>
-					<a href="./people.php?id=<?php echo $_GET["id"]; ?>" class="col active">
+					<a href="./people.php?id=<?php echo $_GET["id"]; ?>" class="col">
 						<i class="ion ion-ios-people"></i>
 						<div class="label">People</div>
 					</a>
@@ -90,6 +156,10 @@
 			</div>
 			</footer>
 			
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" hidden>
+			Launch demo modal
+		</button>
+
 		
 
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" hidden>

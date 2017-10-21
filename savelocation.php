@@ -12,10 +12,12 @@
 	if ($a["b"]) {
 		$name = DB::queryFirstRow("SELECT name FROM users WHERE id=%s", $a["b"])["name"];
 	}
+	$need_help = DB::queryFirstRow("SELECT need_help FROM users WHERE id=%s", $_POST["id"])["need_help"];
 	$result = array(
 		"isSomeoneLookingForMe" => $a["a"],
 		"who_is_looking" => $a["b"],
 		"who_is_looking_name" => $name,
+		"need_help" => $need_help,
 		"location" => $location,
 	);
 	echo json_encode($result);
@@ -24,6 +26,7 @@
 			"isSomeoneLookingForMe" => 0,
 			"who_is_looking" => null,
 			"who_is_looking_name" => null,
+			"need_help" => null,
 			"location" => null,
 		], "id=%s", $_POST["id"]);
 	}
