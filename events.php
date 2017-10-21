@@ -1,11 +1,8 @@
 <?php
 	include "db.php";
 	session_start();
-	$friends = DB::query("SELECT * FROM friends WHERE friend1=%s OR friend2=%s", $_GET["id"]);
 	$me = $_GET["id"];
-	if (!$me) {
-		header("Location: ?id=1");
-	}
+	$a = json_decode(file_get_contents("https://graph.facebook.com/v2.10/amsterdamdanceevent/events?access_token=EAACEdEose0cBANWmL60cmwOtIgHGWKodo0vqNpYA4oz88N4T4imwyfUbaZCysnnnH298Bqan8IJZAm1A9yGpN67znxBflDLNTCKfDp9doqGr5agQXhnpgx6uFosYEamr5KZBgC5hnyZAxHZAY5UTGqZCV228w1nyipvNc2N0ZCrsjIQxGEVtZAdlsZA6k40JpOdwZD"))->data;
 ?>
 <!doctype html>
 <html lang="en">
@@ -23,6 +20,7 @@
 		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
 		<meta name="theme-color" content="#292929">		
 
+		<link rel="stylesheet" href="https://unpkg.com/flickity@2.0.10/dist/flickity.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://anandchowdhary.github.io/ionicons-3-cdn/icons.css" integrity="sha384-+iqgM+tGle5wS+uPwXzIjZS5v6VkqCUV7YQ/e/clzRHAxYbzpUJ+nldylmtBWCP0" crossorigin="anonymous">
 		<link rel="stylesheet" href="default.css">
@@ -42,24 +40,27 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
 		<header id="masthead">
-			<div class="title">Popular Venues</div>
+			<div class="title">Events</div>
 			<button onclick='emergency();' class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
 			<section>
-				<div class="card text-white bg-dark friend-card mb-4">
-					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i>Live Map</div>
-					<div class="card-body p-0">
-						<img alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x500&maptype=roadmap<?php
-							$us = DB::query("SELECT location FROM users");
-							foreach ($us as $users) {
-								$myL = json_decode($users["location"]);
-								echo "&markers=" . $myL[0] . ",+" . $myL[1];
-							}
-						?>&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
+				<?php foreach ($a as $event) { ?>
+					<div class="card card-body bg-dark mb-3">
+						<div class="row">
+							<div class="col-4 pr-0">
+								<img alt="" src="https://maps.googleapis.com/maps/api/staticmap?center=<?php echo urlencode($event->place->name . " Amsterdam"); ?>&zoom=13&size=250x280&maptype=roadmap&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
+							</div>
+							<div class="col">
+								<div><strong><?php echo $event->name; ?></strong></div>
+								<div><span><?php echo date_parse($event->start_time)["day"]; ?>/<?php echo date_parse($event->start_time)["month"]; ?>/<?php echo date_parse($event->start_time)["year"]; ?> <?php echo date_parse($event->start_time)["hour"]; ?>:<?php echo date_parse($event->start_time)["minute"]; ?></span></div>
+								<div><?php echo $event->place->name; ?></div>
+								<div><a href="https://www.facebook.com/events/<?php echo $event->id; ?>" target="_blank">More info</a></div>
+							</div>
+						</div>
 					</div>
-				</div>
+				<?php } ?>
 			</section>
 		</main>
 
@@ -90,6 +91,10 @@
 			</div>
 			</footer>
 			
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" hidden>
+			Launch demo modal
+		</button>
+
 		
 
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" hidden>
@@ -178,9 +183,6 @@
 			}, 10000);
 		}
 	});
-	setTimeout(function() {
-		window.location.reload(1);
-	}, 10000);
 	function pingUser(user, type) {
 		if (!type) { type = null }
 		$("#pingText").text("Pinging...");

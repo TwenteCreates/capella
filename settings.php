@@ -1,11 +1,9 @@
 <?php
 	include "db.php";
 	session_start();
-	$friends = DB::query("SELECT * FROM friends WHERE friend1=%s OR friend2=%s", $_GET["id"]);
 	$me = $_GET["id"];
-	if (!$me) {
-		header("Location: ?id=1");
-	}
+	$profi = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $_GET["id"]);
+	$friends = DB::query("SELECT * FROM friends WHERE friend1=%s OR friend2=%s", $_GET["id"]);
 ?>
 <!doctype html>
 <html lang="en">
@@ -23,6 +21,7 @@
 		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
 		<meta name="theme-color" content="#292929">		
 
+		<link rel="stylesheet" href="https://unpkg.com/flickity@2.0.10/dist/flickity.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://anandchowdhary.github.io/ionicons-3-cdn/icons.css" integrity="sha384-+iqgM+tGle5wS+uPwXzIjZS5v6VkqCUV7YQ/e/clzRHAxYbzpUJ+nldylmtBWCP0" crossorigin="anonymous">
 		<link rel="stylesheet" href="default.css">
@@ -42,23 +41,38 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 
 		<header id="masthead">
-			<div class="title">Popular Venues</div>
+			<div class="title">Settings</div>
 			<button onclick='emergency();' class="btn btn-outline-danger top-right-button"><i class="ion ion-ios-alert"></i></button>
 		</header>
 
 		<main id="content">
 			<section>
-				<div class="card text-white bg-dark friend-card mb-4">
-					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i>Live Map</div>
-					<div class="card-body p-0">
-						<img alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x500&maptype=roadmap<?php
-							$us = DB::query("SELECT location FROM users");
-							foreach ($us as $users) {
-								$myL = json_decode($users["location"]);
-								echo "&markers=" . $myL[0] . ",+" . $myL[1];
-							}
-						?>&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
+				<div class="row p-3">
+					<div class="col-4">
+						<img alt="" src="<?php echo $profi["avatar"]; ?>" class="rounded-circle">
 					</div>
+					<div class="col">
+						<div><strong><?php echo $profi["name"]; ?></strong></div>
+						<div><span><?php echo $profi["tel"]; ?></span></div>
+						<div><a href="#">Edit your profile</a></div>
+					</div>
+				</div>
+			</section>
+			<section>
+				<h2 class="section-title">Friends</h2>
+				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
+				<!-- <div class="row"> -->
+					<?php foreach ($friends as $friend1) {
+						$m1 = "friend1";
+						if ($friend1["friend1"] == $me) { $m1 = "friend2"; }
+						$friend = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $friend1[$m1]); ?>
+					<div class="carousel-cell">
+						<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>">
+							<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
+						</a>
+						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+					</div>
+					<?php } ?>
 				</div>
 			</section>
 		</main>
@@ -82,7 +96,7 @@
 						<i class="ion ion-ios-people"></i>
 						<div class="label">People</div>
 					</a>
-					<a href="./settings.php?id=<?php echo $_GET["id"]; ?>" class="col">
+					<a href="./settings.php?id=<?php echo $_GET["id"]; ?>" class="col active">
 						<i class="ion ion-ios-settings"></i>
 						<div class="label">Settings</div>
 					</a>
@@ -90,6 +104,10 @@
 			</div>
 			</footer>
 			
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" hidden>
+			Launch demo modal
+		</button>
+
 		
 
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" hidden>
@@ -178,9 +196,6 @@
 			}, 10000);
 		}
 	});
-	setTimeout(function() {
-		window.location.reload(1);
-	}, 10000);
 	function pingUser(user, type) {
 		if (!type) { type = null }
 		$("#pingText").text("Pinging...");

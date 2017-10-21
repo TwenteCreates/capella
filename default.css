@@ -137,3 +137,5 @@ audio {
 .modal-backdrop.show {
 	opacity: 0.75;
 }
+
+.main-carousel { outline: none }

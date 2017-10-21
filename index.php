@@ -90,7 +90,7 @@
 						<div class="caption mt-2">People</div>
 					</div>
 					<div class="col">
-						<img alt="" src="./images/events.png">
+						<a href="events.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/events.png"></a>
 						<div class="caption mt-2">Events</div>
 					</div>
 				</div>

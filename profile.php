@@ -48,10 +48,14 @@
 		</header>
 
 		<main id="content">
-			<section>
+			<?php if (DB::queryFirstRow("SELECT * FROM friends WHERE friend1=%s AND friend2=%s OR friend1=%s AND friend2=%s", $_GET["id"], $_GET["user"], $_GET["user"], $_GET["id"])) { ?><section>
 				<div class="card text-white bg-dark friend-card mb-4">
 					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i><?php echo $user["name"]; ?>'s Live Location</div>
 					<div class="card-body">
+						<div class="text-center">
+							<span class="arrow-span" style="display: none; font-size:48px"><i class="ion ion-md-arrow-back"></i></span>
+						</div>
+						<p id="ajdfds">Calculating...</p>
 						<img class="mb-3" alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=<?php echo json_decode($user["location"])[0] . ",+" . json_decode($user["location"])[1]; ?>&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
 						<button class="btn btn-primary mr-1" onclick="pingUser('<?php echo $user["id"]; ?>')"><i class="ion ion-ios-notifications mr-2"></i><span id="pingText">Ping</span></button>
 						<a href="tel:+31644691056" class="btn btn-secondary mr-1"><i class="ion ion-ios-call mr-2"></i>Call</a>
@@ -60,8 +64,7 @@
 					</div>
 				</div>
 				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
-				<!-- <div class="row"> -->
-					<?php foreach ($friends as $friend1) {
+					<?php var_dump($friends); foreach ($friends as $friend1) {
 						$m1 = "friend1";
 						if ($friend1["friend1"] == $me) { $m1 = "friend2"; }
 						$friend = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $friend1[$m1]); ?>
@@ -69,25 +72,44 @@
 						<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>" class="<?php if ($_GET["user"] == $friend["id"]) { echo "currentprofile"; } ?>">
 							<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
 						</a>
-						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+					<?php if ($_GET["user"] == $friend["id"]) { ?>
+						<button onclick="removeFriend();" class="btn btn-secondary mt-3 btn-sm">Unfriend</button>
+					<?php } ?>
 					</div>
-					<!-- <div class="col">
-						<img onclick="$('.friend-card').slideToggle();" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
-						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
-					</div> -->
 					<?php } ?>
 				</div>
-				<!-- <div class="card text-white bg-dark friend-card mt-3">
-					<div class="card-header"><i class="ion ion-ios-pin mr-2"></i>Paula's Live Location</div>
-					<div class="card-body">
-						<img class="mb-3" alt="" src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=400x250&maptype=roadmap&markers=52.4014634,4.8932525&key=AIzaSyCuiZevIb1G87KAoLRSECEdWNBQ06JCMjU">
-						<button class="btn btn-primary mr-1"><i class="ion ion-ios-notifications mr-2"></i>Ping</button>
-						<button class="btn btn-secondary mr-1"><i class="ion ion-ios-call mr-2"></i>Call</button>
-						<button class="btn btn-secondary"><i class="ion ion-md-volume-up mr-2"></i>Ring</button>
-						<p class="text-muted small mt-3 mb-0">By pinging Paula, you'll vibrate her phone and share your location with her.</p>
-					</div>
-				</div> -->
 			</section>
+			<?php } else { ?>
+				<section>
+					<div class="row p-3">
+						<div class="col-4">
+							<img alt="" src="<?php echo $user["avatar"]; ?>" class="rounded-circle">
+						</div>
+						<div class="col">
+							<div><strong><?php echo $user["name"]; ?></strong></div>
+							<div><span><?php echo $user["tel"]; ?></span></div>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h2 class="section-title">Friends</h2>
+					<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
+					<!-- <div class="row"> -->
+						<?php $friends = DB::query("SELECT * FROM friends WHERE friend1=%s OR friend2=%s", $_GET["user"]); foreach ($friends as $friend1) {
+							$m1 = "friend1";
+							if ($friend1["friend1"] == $me) { $m1 = "friend2"; }
+							$friend = DB::queryFirstRow("SELECT * FROM users WHERE id=%s", $friend1[$m1]); ?>
+						<div class="carousel-cell">
+							<a href="profile.php?id=<?php echo $me; ?>&user=<?php echo $friend["id"]; ?>">
+								<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
+							</a>
+							<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+						</div>
+						<?php } ?>
+					</div>
+					<button class="btn btn-primary mt-3 btn-block" onclick="addFriend()";>Add Friend</button>
+				</section>
+			<?php } ?>
 		</main>
 
 		<footer id="colophon">
@@ -171,6 +193,23 @@
 	<script>
 		$(function() {
 			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(position) {
+					var p1 = {
+						x: <?php echo json_decode($user["location"])[0]; ?>,
+						y: <?php echo json_decode($user["location"])[1]; ?>
+					};
+					var p2 = {
+						x: position.coords.latitude,
+						y: position.coords.longitude
+					};
+					var angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+					var a = <?php echo json_decode($user["location"])[0]; ?> - position.coords.latitude;
+					var b = <?php echo json_decode($user["location"])[1]; ?> - position.coords.longitude;
+					var c = Math.sqrt(a*a + b*b);
+					$("#ajdfds").html("Move in this direction for " + parseInt(c*69.172*1.60934*1000) + " meters");
+					$(".arrow-span").css("transform", "rotate(" + parseInt(angleDeg) + "deg)");
+					$(".arrow-span").css("display", "inline-block");
+				});
 				function doFunction() {
 					navigator.geolocation.getCurrentPosition(function(position) {
 						var $cords = JSON.stringify([position.coords.latitude, position.coords.longitude]);
@@ -214,6 +253,16 @@
 		}
 		function emergency() {
 			$('[data-target="#exampleModal2"]').click();
+		}
+		function addFriend() {
+			$.get("addfriend.php?me=<?php echo $_GET["id"]; ?>&you=<?php echo $_GET["user"]; ?>", function() {
+				window.location.reload(1);
+			});
+		}
+		function removeFriend() {
+			$.get("removefriend.php?me=<?php echo $_GET["id"]; ?>&you=<?php echo $_GET["user"]; ?>", function() {
+				window.location.reload(1);
+			});
 		}
 	</script>
 
