@@ -2,7 +2,7 @@
 	include "db.php";
 	session_start();
 	$me = $_GET["id"];
-	$a = json_decode(file_get_contents("https://graph.facebook.com/v2.10/amsterdamdanceevent/events?access_token=EAACEdEose0cBAGJh8UY55SEfYMzIXQoFvf0IKfCGBhWkQz2pPtmfes7RiJzxTTJWh6u1zpmYAbUvndARtef8qoApTNtWzTZCpVZAIlTIrOZB27J3xhZCc5KZBQl2OsS4KQiu5W1DZCo7vO8zoGkamL5omK9ChS4GQqLS88JIqjC9z6rkKXZAyC8W1LQ7FGAtaQZD"))->data;
+	$a = json_decode(file_get_contents("https://graph.facebook.com/v2.10/amsterdamdanceevent/events?access_token=EAACEdEose0cBAArFmDs2Q8P7o5DntQeEXG8AVlu5Vr9Qe8qpA03ZA76jJV4tqDChP4LRdRBEUHgZApZA8JkBxlsm81eUZA6AHqsis8VELK8wZBXHfszjK0ZCLlsvZBvmpmTjOfYsgamEpc6B1dinDc7yAuIY15DrA2qf5glNdQqvv16JcUHMWBW59BZA9umjZAMlhGc6qBLGUiQZDZD"))->data;
 ?>
 <!doctype html>
 <html lang="en">
@@ -13,12 +13,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 
-		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-		<link rel="manifest" href="./manifest.json">
-		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
-		<meta name="theme-color" content="#292929">		
+		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="194x194" href="./favicon-194x194.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="192x192" href="./android-chrome-192x192.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=RyMwR3jE6k">
+		<link rel="manifest" href="./manifest.json?v=RyMwR3jE6k">
+		<link rel="mask-icon" href="./safari-pinned-tab.svg?v=RyMwR3jE6k" color="#ef394f">
+		<link rel="shortcut icon" href="./favicon.ico?v=RyMwR3jE6k">
+		<meta name="apple-mobile-web-app-title" content="Capella">
+		<meta name="application-name" content="Capella">
+		<meta name="msapplication-TileColor" content="#da532c">
+		<meta name="msapplication-TileImage" content="./mstile-144x144.png?v=RyMwR3jE6k">
+		<meta name="theme-color" content="#292929">
 
 		<link rel="stylesheet" href="https://unpkg.com/flickity@2.0.10/dist/flickity.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
@@ -31,7 +38,7 @@
 		<link rel="author" href="//plus.google.com/+AnandChowdhary">
 		<meta property="og:author" content="//facebook.com/AnandChowdhary">
 
-		<script> var host="DOMAIN"; host == window.location.host && "https:" != window.location.protocol && (window.location.protocol = "https"); </script>
+		<script> var host="capella.tk"; host == window.location.host && "https:" != window.location.protocol && (window.location.protocol = "https"); </script>
 
 	</head>
 
@@ -180,7 +187,7 @@
 			doFunction();
 			setInterval(function() {
 				doFunction();
-			}, 10000);
+			}, 5000);
 		}
 	});
 	function pingUser(user, type) {

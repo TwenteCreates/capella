@@ -16,12 +16,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 
-		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-		<link rel="manifest" href="./manifest.json">
-		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
-		<meta name="theme-color" content="#292929">		
+		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="194x194" href="./favicon-194x194.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="192x192" href="./android-chrome-192x192.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=RyMwR3jE6k">
+		<link rel="manifest" href="./manifest.json?v=RyMwR3jE6k">
+		<link rel="mask-icon" href="./safari-pinned-tab.svg?v=RyMwR3jE6k" color="#ef394f">
+		<link rel="shortcut icon" href="./favicon.ico?v=RyMwR3jE6k">
+		<meta name="apple-mobile-web-app-title" content="Capella">
+		<meta name="application-name" content="Capella">
+		<meta name="msapplication-TileColor" content="#da532c">
+		<meta name="msapplication-TileImage" content="./mstile-144x144.png?v=RyMwR3jE6k">
+		<meta name="theme-color" content="#292929">
 
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://anandchowdhary.github.io/ionicons-3-cdn/icons.css" integrity="sha384-+iqgM+tGle5wS+uPwXzIjZS5v6VkqCUV7YQ/e/clzRHAxYbzpUJ+nldylmtBWCP0" crossorigin="anonymous">
@@ -33,7 +40,7 @@
 		<link rel="author" href="//plus.google.com/+AnandChowdhary">
 		<meta property="og:author" content="//facebook.com/AnandChowdhary">
 
-		<script> var host="DOMAIN"; host == window.location.host && "https:" != window.location.protocol && (window.location.protocol = "https"); </script>
+		<script> var host="capella.tk"; host == window.location.host && "https:" != window.location.protocol && (window.location.protocol = "https"); </script>
 
 	</head>
 
@@ -103,7 +110,7 @@
 						<div class="caption mt-2">Music Taste</div>
 					</div>
 					<div class="col">
-						<img alt="" src="./images/singalong.png">
+						<a href="search.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/singalong.png"></a>
 						<div class="caption mt-2">SingAlong&trade;</div>
 					</div>
 				</div>
@@ -113,7 +120,7 @@
 						<div class="caption mt-2">Music Finder</div>
 					</div>
 					<div class="col">
-						<img alt="" src="./images/musicdiscovery.png">
+						<a href="recommendations.php?id=<?php echo $_GET["id"]; ?>"><img alt="" src="./images/musicdiscovery.png"></a>
 						<div class="caption mt-2">Recommendations</div>
 					</div>
 				</div>
@@ -239,7 +246,7 @@
 					doFunction();
 					setInterval(function() {
 						doFunction();
-					}, 10000);
+					}, 5000);
 				}
 			});
 			function pingUser(user, type) {

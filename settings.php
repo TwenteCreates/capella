@@ -14,12 +14,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 
-		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-		<link rel="manifest" href="./manifest.json">
-		<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#ea4554">
-		<meta name="theme-color" content="#292929">		
+		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="194x194" href="./favicon-194x194.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="192x192" href="./android-chrome-192x192.png?v=RyMwR3jE6k">
+		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=RyMwR3jE6k">
+		<link rel="manifest" href="./manifest.json?v=RyMwR3jE6k">
+		<link rel="mask-icon" href="./safari-pinned-tab.svg?v=RyMwR3jE6k" color="#ef394f">
+		<link rel="shortcut icon" href="./favicon.ico?v=RyMwR3jE6k">
+		<meta name="apple-mobile-web-app-title" content="Capella">
+		<meta name="application-name" content="Capella">
+		<meta name="msapplication-TileColor" content="#da532c">
+		<meta name="msapplication-TileImage" content="./mstile-144x144.png?v=RyMwR3jE6k">
+		<meta name="theme-color" content="#292929">
 
 		<link rel="stylesheet" href="https://unpkg.com/flickity@2.0.10/dist/flickity.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
@@ -32,7 +39,7 @@
 		<link rel="author" href="//plus.google.com/+AnandChowdhary">
 		<meta property="og:author" content="//facebook.com/AnandChowdhary">
 
-		<script> var host="DOMAIN"; host == window.location.host && "https:" != window.location.protocol && (window.location.protocol = "https"); </script>
+		<script> var host="capella.tk"; host == window.location.host && "https:" != window.location.protocol && (window.location.protocol = "https"); </script>
 
 	</head>
 
@@ -54,12 +61,13 @@
 					<div class="col">
 						<div><strong><?php echo $profi["name"]; ?></strong></div>
 						<div><span><?php echo $profi["tel"]; ?></span></div>
-						<div><a href="#">Edit your profile</a></div>
+						<div><button class="btn btn-danger mt-2" data-toggle="modal" data-target="#exampleModal3">View QR Code</button></div>
+						
 					</div>
 				</div>
 			</section>
 			<section>
-				<h2 class="section-title">Friends</h2>
+				<h2 class="section-title">Your Friends</h2>
 				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
 				<!-- <div class="row"> -->
 					<?php foreach ($friends as $friend1) {
@@ -71,6 +79,32 @@
 							<img onclick="getUserLocation('<?php echo $friend["id"]; ?>');" alt="" src="<?php echo $friend["avatar"]; ?>" class="rounded-circle">
 						</a>
 						<div class="text-center mt-2"><?php echo $friend["name"]; ?></div>
+					</div>
+					<?php } ?>
+				</div>
+			</section>
+			<section class="mt-4">
+				<h2 class="section-title">Your Favorite Genres</h2>
+				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
+				<!-- <div class="row"> -->
+					<?php $a = DB::query("SELECT DISTINCT genre FROM likes WHERE who_likes=%s", $_GET["id"]);
+						foreach ($a as $genre) { ?>
+					<div class="carousel-cell">
+						<img alt="" src="https://tse2.mm.bing.net/th?q=<?php echo $genre["genre"]; ?>&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+						<div class="text-center mt-2"><?php echo $genre["genre"]; ?></div>
+					</div>
+					<?php } ?>
+				</div>
+			</section>
+			<section class="mt-4">
+				<h2 class="section-title">Your Favorite Artists</h2>
+				<div class="main-carousel" data-flickity='{ "cellAlign": "left", "contain": true }'>
+				<!-- <div class="row"> -->
+					<?php $a = DB::query("SELECT DISTINCT artist FROM likes WHERE who_likes=%s", $_GET["id"]);
+						foreach ($a as $artist) { ?>
+					<div class="carousel-cell">
+						<img alt="" src="https://tse2.mm.bing.net/th?q=<?php echo $artist["artist"]; ?>&w=70&h=70&c=7&rs=1&p=0&dpr=3&pid=1.7&mkt=en-IN&adlt=moderate" class="rounded-circle">
+						<div class="text-center mt-2"><?php echo $artist["artist"]; ?></div>
 					</div>
 					<?php } ?>
 				</div>
@@ -103,6 +137,29 @@
 				</div>
 			</div>
 			</footer>
+
+<div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel3" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content bg-dark">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel3"><i class="ion ion-md-alert mr-2"></i>QR Code</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-center p-5">
+				<img alt="" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={%22name%22:%22Mike+Smith%22,%22bloodgroup%22:%22B+%22,%22diseases%22:%22none%22,%22ice%22:%22+919555297989%22,%22allergies%22:%22none%22}">
+				<p class="mt-4">
+					<strong>Name</strong>: Mike Smith<br>
+					<strong>Blood Group</strong>: B+<br>
+					<strong>Diseases</strong>: None<br>
+					<strong>Allergies</strong>: None<br>
+					<strong>Emergency No.</strong>: +31655297989<br>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
 			
 			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" hidden>
 			Launch demo modal
@@ -193,7 +250,7 @@
 			doFunction();
 			setInterval(function() {
 				doFunction();
-			}, 10000);
+			}, 5000);
 		}
 	});
 	function pingUser(user, type) {
