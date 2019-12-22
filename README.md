@@ -16,6 +16,10 @@ Capella is a mobile app for concerts, where users can make new friends with simi
 
 This app is built using HTML, CSS, and JavaScript, with a PHP/MySQL backend. Just running the root directory on an Apache server with PHP 5+ installed is enough.
 
+## 👥 Contributors
+
+[![Profile pictures of contributors on GitHub](https://services.anandchowdhary.now.sh/api/github-contributors?repo=c-r-e-a-t-e/capella)](https://github.com/c-r-e-a-t-e/capella/graphs/contributors)
+
 ## 📄 License
 
 - Code: [MIT](/LICENSE)
